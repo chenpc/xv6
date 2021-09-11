@@ -4,25 +4,23 @@
 int
 main(int argc, char *argv[])
 {
-  int p_pid;
-  int pipefd[2];  
+  int pipefd_p[2];
+  int pipefd_c[2];
   char c_buf[256];
   char p_buf[256];
 
-  pipe(pipefd);
+  pipe(pipefd_p);
+  pipe(pipefd_c);
 
-  p_pid = getpid();
-  fork();
-
-  if (getpid() == p_pid) {
-    write(pipefd[0], "ping", 5);
-    read(pipefd[0], p_buf, 5);
+  if (fork() != 0) {
+    write(pipefd_c[1], "ping", 5);
+    read(pipefd_p[0], p_buf, 5);
     printf("%d: received pong\n", getpid());
   } else  {
-    read(pipefd[1], c_buf, 5);
+    read(pipefd_c[0], c_buf, 5);
     printf("%d: received ping\n", getpid());
-    write(pipefd[1], "pong", 5);    
-  }
+    write(pipefd_p[1], "pong", 5);
+  }  
   exit(0);  
 }
 
